@@ -20,6 +20,7 @@ const User = sequelize.define(
     },
     email: DataTypes.STRING,
     gender: DataTypes.STRING,
+    profile_picture: DataTypes.STRING,
   },
   { underscored: true }
 );

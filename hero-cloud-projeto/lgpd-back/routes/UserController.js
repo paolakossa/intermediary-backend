@@ -1,8 +1,29 @@
 import express from "express";
+import userService from "../services/UserService.js";
+import multer from "multer";
+import process from "process";
 
 let router = express.Router();
 
-import userService from "../services/UserService.js";
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./images");
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      req.body.first_name +
+        "_" +
+        req.body.last_name +
+        "_" +
+        Date.now() +
+        "_" +
+        file.originalname
+    );
+  },
+});
+
+const upload = multer({ storage: storage }).single("profile_picture");
 
 router.post("/addUser", async (req, res) => {
   const userModel = {
@@ -10,6 +31,7 @@ router.post("/addUser", async (req, res) => {
     last_name: req.body.last_name,
     email: req.body.email,
     gender: req.body.gender,
+    profile_picture: req.file ? req.file.path : null,
   };
   const user = await userService.saveUser(userModel);
   return res.status(201).json({
@@ -61,6 +83,7 @@ router.put("/updateUser/:id", async (req, res) => {
     last_name: req.body.last_name,
     email: req.body.email,
     gender: req.body.gender,
+    profile_picture: req.file ? req.file.path : null,
   };
   const updatedUser = await userService.updateUserById(id, userModel);
   if (!updatedUser) {
